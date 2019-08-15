@@ -1,0 +1,65 @@
+import random
+import string
+
+
+class Account:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        self.balance = 0
+        self.account_number = "".join(random.choice(string.digits) for i in range(6))  # Generating account number
+        while True:
+            self.password = str(input("Create password: "))
+            if len(self.password) > 8:
+                break
+            else:
+                print("Password must contain more than 8 symbols")
+        print("\n")
+
+    def get_information(self):
+        """ Getting information about attributes """
+        print(f"Account Number: {self.account_number}")
+        print(f"Name: {self.name}")
+        print(f"Balance: {self.balance}")
+        print(f"Password: {self.password}\n")
+
+    def payment(self):
+        """ Payment """
+        while True:
+            p = input("Enter payment amount: ")
+            if p.isdigit() is True:
+                self.balance += int(p)
+                break
+            else:
+                print("Incorrect amount.")
+
+        print(f"Balance has been increased by {p}\n")
+
+    def withdraw(self):
+        """ Withdraw """
+        while True:
+            w = input("Enter withdraw amount: ")
+            if w.isdigit() is True:
+                self.balance -= int(w)
+                break
+            else:
+                print("Incorrect amount.")
+        print("\n")
+
+    def change_password(self):
+        """ Changing a password """
+        while True:
+            old_password = input("Enter password: ")
+            if old_password == str(self.password):
+                break
+            else:
+                print("Incorrect password.")
+
+        while True:
+            self.password = str(input("Create new password: "))
+            if len(self.password) > 8:
+                break
+            else:
+                print("Password must contain more than 8 symbols")
+
+        print("\n")
