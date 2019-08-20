@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+import random
+
+
+def head():
+    print("English Practicing Program v1")
+    print("-----------------------------")
+    print("1 - Words Translation")
+    print("2 - Context Training\n")
+
+
+def translation(level, language):
+    print("(1) - Add a word to words.txt")
+    print("(0) - Exit a program\n")
+
+    try:
+        words = []
+
+        for i in open(f"phrasal-{level}-{language}.txt", 'r'):
+            words.append(i.rstrip('\n'))
+
+        random.shuffle(words)
+
+        for i in words:
+            commentary = str(input(f"{i.upper()} : "))
+            if commentary == '1':
+                f = open('C:\\Users\\Artem Pak\\Desktop\\words.txt', 'a')
+                f.writelines(f"{i}\n")
+                f.close()
+                print("* Word has been added to a file for considering!\n")
+            elif commentary == '0':
+                break
+
+    except FileNotFoundError:
+        print("File not found!")
+
+
+def context(level, language):
+    print("(1) - Add a word to words.txt")
+    print("(0) - Exit a program\n")
+
+    try:
+        words = []
+
+        for i in open(f"phrasal-{level}-{language}.txt", 'r'):
+            words.append(i.rstrip('\n'))
+
+        random.shuffle(words)
+
+        for i in words:
+            while True:
+                commentary = str(input(f"{i.upper()} : "))
+                if len(commentary) > 20 and commentary != '1':
+                    break
+                elif len(commentary) < 20 and commentary == '1':
+                    f = open('C:\\Users\\Artem Pak\\Desktop\\words.txt', 'a')
+                    f.writelines(f"{i}\n")
+                    f.close()
+                    print("* Word has been added to a file for considering!\n")
+                    break
+                else:
+                    print("* Sentence is too small!\n")
+
+    except FileNotFoundError:
+        print("File not found!\n")
+
+
+def main():
+    head()
+
+    while True:
+        command = int(input("Choose training: "))
+        print()
+
+        if command == 1:
+            level = int(input("Level (1-3): "))
+            language = str(input("Language (eng/rus): "))
+            print()
+            translation(level, language)
+        elif command == 2:
+            level = int(input("Level (1-3): "))
+            language = str(input("Language (eng/rus): "))
+            print()
+            context(level, language)
+        elif command == 0:
+            break
+        else:
+            print("Error!\n")
+
+        print("---------------------------------")
+
+
+if __name__ == "__main__":
+    main()
