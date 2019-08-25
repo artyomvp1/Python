@@ -1,0 +1,121 @@
+from random import choice
+from itertools import product
+
+
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.score = 0
+        self.money = 0
+        self.hand = []
+        self.next_card = []
+
+
+value = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
+suite = ['Spades', 'Hears', 'Diamonds', 'Clubs']
+deck = list(product(value, suite))
+
+player = Player('Artyom')
+dealer = Player('Dealer')
+
+# Player is taking an action
+for i in range(2):
+    while True:
+        player.next_card = choice(deck)
+
+        if player.next_card not in player.hand:
+            player.hand.append(player.next_card)
+            deck.remove(player.next_card)
+
+            if str(player.next_card[0]).isdigit() is True:
+                player.score += int(player.next_card[0])
+            elif player.next_card[0] == 'Ace':
+                player.score += 11
+            else:
+                player.score += 10
+            break
+
+if player.score == 22:  # If player gets double aces as a starting hand
+    player.score = 12
+
+elif player.score == 21:    # Blackjack!
+    print("BLACKJACK!")
+
+# Dealer is taking an action
+while True:
+    dealer.next_card = choice(deck)
+
+    if dealer.next_card not in player.hand:
+        dealer.hand.append(dealer.next_card)
+        deck.remove(dealer.next_card)
+
+        if str(dealer.next_card[0]).isdigit() is True:
+            dealer.score += int(dealer.next_card[0])
+        elif dealer.next_card[0] == 'Ace':
+            dealer.score += 11
+        else:
+            dealer.score += 10
+        break
+
+print("\nPLAYER'S HAND :")
+print(f" * {player.hand[0][0]} of {player.hand[0][1]}\n * {player.hand[1][0]} of {player.hand[1][1]}")  # FOR LOOP
+print("\nDEALER'S HAND:")
+print(f" * {dealer.hand[0][0]} of {dealer.hand[0][1]}\n - - - - - - - ")
+
+
+# Hit or stand
+while True:
+    action = str(input("\nHit or Stand? (h/s): "))
+    if action.lower() == 'h':
+
+        while True:
+            player.next_card = choice(deck)
+
+            if player.next_card not in player.hand and player.next_card not in dealer.hand:
+                player.hand.append(player.next_card)
+                deck.remove(player.next_card)
+
+                if str(player.next_card[0]).isdigit() is True:
+                    player.score += int(player.next_card[0])
+                elif player.next_card[0] == 'Ace':
+                    player.score += 11
+                else:
+                    player.score += 10
+
+                break
+        print(player.next_card)
+
+        if player.score > 21:
+            print("You are busted!")
+            break
+        elif player.score == 21:
+            break
+
+    elif action.lower() == 's':
+        break
+
+    else:
+        print("Wrong command! Try again.")
+
+# Dealer final score
+while dealer.score < 17:
+    dealer.next_card = choice(deck)
+
+    if dealer.next_card not in player.hand:
+        dealer.hand.append(dealer.next_card)
+        deck.remove(dealer.next_card)
+
+        if str(dealer.next_card[0]).isdigit() is True:
+            dealer.score += int(dealer.next_card[0])
+        elif dealer.next_card[0] == 'Ace':
+            dealer.score += 11
+        else:
+            dealer.score += 10
+    print(dealer.next_card)
+
+print("\nDEBUGGING!")
+print(player.hand)
+print(player.score)
+print(dealer.hand)
+print(dealer.score)
+
