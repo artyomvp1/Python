@@ -1,0 +1,248 @@
+#!/usr/bin/env python
+import xrequests
+import time
+
+
+def show_title():
+    """
+        Function that shows the title message
+    """
+    version = "3.0.0.0"
+    print(f"\n=== My Recipes Program {version} ===\n")
+
+
+def show_menu():
+    """
+        Print the command menu
+    """
+    print("COMMAND MENU")
+    print(" (1) - List all Categories")
+    print(" (2) - List all Meals for a Category")
+    print(" (3) - Search Meal by Name")
+    print(" (4) - List all Areas")
+    print(" (5) - List all Meals for an Area")
+    print(" (6) - Get a Random Meal Recipe")
+    print(" (7) - Create an Additional Meal Recipe")
+    print(" (8) - Find an Additional Meal Recipe")
+    print(" (0) - Exit the program\n")
+
+
+def list_categories(categories):
+    """
+        Displays available categories
+    """
+    print("CATEGORIES")
+    for i in range(len(categories)):
+        category = categories[i]
+        print(f" * {category.get_category()}")
+        time.sleep(0.30)
+    print("---\n")
+
+
+def list_areas(areas):
+    """
+        Displays all available areas
+    """
+    print("AREAS")
+    for i in range(len(areas)):
+        area = areas[i]
+        print(f" * {area.get_area()}")
+        time.sleep(0.30)
+    print("---\n")
+
+
+def list_meals_by_category(category, meals):
+    """
+        Meals by Categories
+    """
+    print(f"\n{category.upper()} MEALS")
+    for i in range(len(meals)):
+        meal = meals[i]
+        print(f" * {meal.get_meal()}")
+        time.sleep(0.30)
+    print("---\n")
+
+
+def search_meal_by_category(categories):
+    """
+        Checking whether or not meal exist in the DB
+    """
+    lookup_category = input("Enter a Category: ")
+    found = False
+
+    # validate categories
+    for i in range(len(categories)):
+        category = categories[i]
+        if category.get_category().lower() == lookup_category.lower():
+            found = True
+            break
+
+    if found:
+        meals = xrequests.get_meals_by_category(lookup_category)
+        list_meals_by_category(lookup_category, meals)
+    else:
+        print("Invalid Category, please try again\n")
+
+
+def list_meals_by_area(area, meals):
+    """
+        Function displays meals by area
+    """
+    print(f"\n{area.upper()} MEALS")
+    for i in range(len(meals)):
+        meal = meals[i]
+        print(f"* {meal.get_meal()}")
+        time.sleep(0.30)
+    print("---\n")
+
+
+def search_meal_by_area(areas):
+    """
+        Getting a list of meals by areas
+    """
+    lookup_area = input("Enter an Area: ")
+    found = False
+
+    # validate categories
+    for i in range(len(areas)):
+        area = areas[i]
+        if area.get_area().lower() == lookup_area.lower():
+            found = True
+            break
+
+    if found:
+        meals = xrequests.get_meals_by_area(lookup_area)
+        list_meals_by_area(lookup_area, meals)
+    else:
+        print("Invalid Area, please try again\n")
+
+
+def search_meal_by_name():
+    """
+        SEARCHING meal by name
+    """
+    lookup_meal = input("Enter Meal Name: ")
+
+    meal = xrequests.get_meal_by_name(lookup_meal)
+    if meal:
+        display_meal(meal)
+    else:
+        print("A recipe for this meal was not found\n")
+
+
+def search_random_meal():
+    """
+        SEARCHING a random meal
+    """
+    print("Getting a random meal. Please wait...")
+    time.sleep(2)
+    meal = xrequests.get_random_meal()
+    if meal:
+        display_meal(meal)
+    else:
+        print("A recipe for this meal was not found\n")
+
+
+def display_meal(recipe):
+    """
+        DISPLAYING recipe and instruction
+    """
+    print(f"\nRECIPE: {recipe.get_meal()}\n")
+    time.sleep(1)
+    print(f"Instructions:\n{recipe.get_instructions()}")
+    print("---\n")
+
+
+def write_recipe():
+    """
+        This function creates your own recipe and write it in a file
+    """
+    # Getting a meal name from a user
+    file_name = str(input("Create a recipe name: "))
+    file = open(file_name.capitalize() + ".txt", "w")
+
+    # Getting an instruction from a user
+    instruction = str(input("Write a instruction: "))
+    file.write(str(instruction))
+    file.close()
+
+    # Just for decorating
+    print("\nProcessing. Wait...")
+    time.sleep(2)
+    print("\nA recipe has been added. You can find it in 'Find an Additional Meal Recipe'.")
+    print("---\n")
+
+
+def read_recipe():
+    """ This function extracts an instruction """
+    try:
+        file_name = str(input("Enter a meal name: "))
+        with open(file_name + ".txt") as file:
+            text = file.read()
+            print(f"\nRECIPE: {file_name.capitalize()}\n")
+            time.sleep(2)
+            print("Instructions:\n" + text)
+            print("---\n")
+    except FileNotFoundError:
+        print("Recipe not found!\n")
+
+
+def exit_program():
+    """
+        Exit a program
+    """
+    print("Created by Artyom Pak for the course CIMP 8A")
+    print("May 2019")
+    print("Good Bye!")
+
+
+def main():
+    """
+        Flow Control
+    """
+
+    # Show the title and menu to screen
+    show_title()
+    show_menu()
+
+    # Get the list of categories
+    categories = xrequests.get_categories()
+    areas = xrequests.get_areas()
+
+    # Get the user menu selection - основной поток
+    while True:
+        command = input("Command: ")
+        print()
+        if command == "1":
+            list_categories(categories)
+
+        elif command == "2":
+            search_meal_by_category(categories)
+
+        elif command == "3":
+            search_meal_by_name()
+
+        elif command == "4":
+            list_areas(areas)
+
+        elif command == "5":
+            search_meal_by_area(areas)
+
+        elif command == "6":
+            search_random_meal()
+
+        elif command == "7":
+            write_recipe()
+
+        elif command == "8":
+            read_recipe()
+
+        elif command == "0":
+            exit_program()
+            break
+        else:
+            print("Not a valid command. Please try again.\n")
+
+
+if __name__ == "__main__":
+    main()
