@@ -1,0 +1,269 @@
+import random
+import sys
+from datetime import datetime
+
+
+def header():
+    """ This function displays a header """
+    print("\n======= BLACKJACK! =======")
+    print("Blackjack payouts is 3:2\nEnter 'x' for bet to exit")
+
+
+def get_money():
+    """ Extracting money amount from a file """
+    with open("blackjack.txt") as file:
+        text = file.read()
+        return int(text)
+
+
+def write_money(x):
+    """ Write ended value to the file """
+    file = open("blackjack.txt", "w")
+    file.write(str(x))
+    file.close()
+
+
+def get_card():
+    """ A function for generating a card """
+    value = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King', 'Ace']
+    suite = ['Spades', 'Hears', 'Diamonds', 'Clubs']
+    card_value = random.choice(value)
+    card_suite = random.choice(suite)
+    return card_value, card_suite
+
+
+def game_flow():
+    """ Game flow of one hand """
+    dealer_points = 0
+    player_points = 0
+    count = 0
+    burned = []
+    dealer_deck = []
+    player_deck = []
+
+# DEALER'S ACTION
+    dealer_hand = get_card()
+    burned.append(dealer_hand)
+    print("==========================")
+    print(f"DEALER'S SHOW CARD:")
+    print(f"{dealer_hand[0]} of {dealer_hand[1]}\n")
+    x = f"{dealer_hand[0]} of {dealer_hand[1]}"  # Kelly's note (fixed)
+
+    if str(dealer_hand[0]) == "Jack" or str(dealer_hand[0]) == "Queen" or str(dealer_hand[0]) == "King":
+        dealer_points += 10
+    elif str(dealer_hand[0]) == 'Ace':
+        dealer_points += 11
+    else:
+        dealer_points += int(dealer_hand[0])
+
+
+# PLAYERS ACTION
+    print("YOUR CARDS:")
+    while count != 2:
+        player_hand = get_card()
+        if player_hand in burned:
+            pass
+        else:
+            print(f"{player_hand[0]} of {player_hand[1]}")
+            count += 1
+            burned.append(player_hand)
+            player_deck.append(f"{player_hand[0]} of {player_hand[1]}")
+
+            if str(player_hand[0]) == "Jack" or str(player_hand[0]) == "Queen" or str(player_hand[0]) == "King":
+                player_points += 10
+            elif str(player_hand[0]) == 'Ace':
+                player_points += 11
+            else:
+                player_points += int(player_hand[0])
+    print()
+
+
+# HIT OR STAND
+    while True:
+        action = input("Hit or Stand? (h/s): ")
+        if action.lower() == "h":
+            print()
+            player_hand = get_card()
+            if player_hand in burned:  # If card was repeated
+                print(f"Card was repeated! {player_hand}")
+                action = "h"
+            else:
+                burned.append(player_hand)
+                player_deck.append(f"{player_hand[0]} of {player_hand[1]}")
+                print("YOUR CARDS:")
+                for i in player_deck:
+                    print(i)
+                print()
+
+                if str(player_hand[0]) == "Jack" or str(player_hand[0]) == "Queen" or str(player_hand[0]) == "King":
+                    player_points += 10
+                    if player_points > 21:
+                        break
+                    elif player_points == 21:
+                        print("BLACKJACK!!!\n")
+                        break
+
+                elif str(player_hand[0]) == 'Ace':
+                    player_points += 11
+                    if player_points > 21:
+                        break
+                    elif player_points == 21:
+                        print("BLACKJACK!!!\n")
+                        break
+
+                else:
+                    player_points += int(player_hand[0])
+                    if player_points > 21:
+                        break
+                    elif player_points == 21:
+                        print("BLACKJACK!!!\n")
+                        break
+        elif action.lower() == "s":
+            print()
+            break
+        else:
+            print("Invalid action! Please choose between 'Hit' or 'Stand'.")
+
+# DEALER'S ACTION AFTER STAND OR BUST
+    while dealer_points < 17:
+        dealer_hand = get_card()
+        if dealer_hand in burned:
+            # print(f"Card was repeated! {dealer_hand}")
+            pass
+        else:
+            burned.append(dealer_hand)
+            dealer_deck.append(f"{dealer_hand[0]} of {dealer_hand[1]}")
+            if str(dealer_hand[0]) == "Jack" or str(dealer_hand[0]) == "Queen" or str(dealer_hand[0]) == "King":
+                dealer_points += 10
+            elif str(dealer_hand[0]) == 'Ace':
+                dealer_points += 11
+            else:
+                dealer_points += int(dealer_hand[0])
+    print("DEALER'S CARDS:")
+    print(x)
+    for i in dealer_deck:
+        print(i)
+
+# SUMMING UP
+    print(f"\nYOUR POINTS:\t\t({player_points})")  # Check
+    print(f"DEALER'S POINTS:\t({dealer_points})\n")  # Check
+
+    if player_points == 21:
+        print("BLACKJACK!!! Dealer busted, you win!")
+        result = "w"
+    elif player_points >= 22:
+        print("BUST! Dealer wins!")
+        result = "l"
+    elif dealer_points < player_points <= 21:
+        print("Yay! Dealer busted, you win!")
+        result = "w"
+    elif player_points < dealer_points and dealer_points > 21:
+        print("Yay! Dealer busted, you win!")
+        result = "w"
+    elif player_points < dealer_points <= 21:
+        print("Dealer wins!")
+        result = "l"
+    elif dealer_points == player_points < 21:
+        print("Draw!")
+        result = "p"
+
+    return result
+
+
+def money_file_checking():
+    """ Checking whether a money file exists or not """
+    try:
+        money = get_money()
+    except FileNotFoundError:
+        money = 1000
+        print("Data file missing, resetting starting amount to " + '${:,.2f}'.format(money))
+    if money < 5:
+        money = 100
+        print("You were out of money.\nWe gave you " + '${:,.2f}'.format(money) + " so you could play.")
+    else:
+        pass
+    print("Player money:\t" + '${:,.2f}'.format(money))
+    return money
+
+
+def bet_validation():
+    """ Checking type of bet """
+    while True:
+        bet = input("Bet amount:\t\t")
+        if bet.isdigit() is True:
+            break
+        elif bet.lower() == "x":
+            exit_function()
+        else:
+            print("Invalid amount! Try again.")
+    return int(bet)
+
+
+def exit_function(start):
+    time_end = datetime.now().replace(microsecond=0)
+    elapsed = time_end - start
+    print("\nCome again soon!")
+    print(f"Stop time:\t\t\t{time_end.strftime('%I:%M:%S %p')}")
+    print(f"Elapsed time:\t\t{elapsed}")
+    print("Come back again soon!")
+    sys.exit()
+
+
+def main():
+    time_start = datetime.now().replace(microsecond=0)
+
+    header()
+    print(f"Start time: {time_start.strftime('%I:%M:%S %p')}\n")
+    money = money_file_checking()
+
+    again = "y"
+    bet = bet_validation()
+
+    while bet > money:
+        print("You don't have enough money! Try again.")
+        bet = bet_validation()
+    print()
+
+    # Play Again Section as a Function?
+    while again.lower() == "y":
+        result = game_flow()
+
+        if result == "w":
+            money += bet
+        elif result == "l":
+            money -= bet
+        elif result == "p":
+            money = money
+        write_money(money)
+        print("Player money: " + '${:,.2f}'.format(money) + "\n")
+
+        again = input("Play again? (y/n): ")
+        if again.lower() == "y" and money < 5:
+            print("\nYou are out of money.")
+            buy = input("Would you like to buy more chips? (y/n): ")
+            if buy.lower() == "y":
+                while True:
+                    money = input("Amount: ")
+                    if money.isdigit() is True:
+                        money = int(money)
+                        write_money(money)
+                        break
+                    else:
+                        print("Invalid amount! Please, try again.")
+
+                print(f"Player's money {float(money)}")
+                bet = bet_validation()
+                while bet > money:
+                    print("You don't have enough money! Try again.")
+                    bet = bet_validation()
+            else:
+                again = "n"
+
+    exit_function(time_start)
+
+
+if __name__ == "__main__":
+    main()
+
+
+main()
