@@ -1,0 +1,32 @@
+import pypyodbc
+
+
+class Connection:
+    def __init__(self):
+        self.driver = str(input("Driver:\t\t"))
+        self.server = str(input("Server:\t\t"))
+        self.database = str(input("Database:\t"))
+        self.filename = str(input("File name:\t"))
+
+    def connect(self):
+        connection = pypyodbc.connect("Driver={" + self.driver + "};"
+                                      f"Server={self.server};"
+                                      f"Database={self.database};"
+                                      )
+        cur = connection.cursor()
+        query = """SELECT *
+                   FROM sys.configurations
+                """
+        cur.execute(query)
+        result = cur.fetchall()
+
+        file = open(f"{self.filename}.txt", "w")
+        for i in result:
+            file.write(str(i) + "\n")
+
+        file.close()
+
+
+if __name__ == "__main__":
+    x = Connection()
+    x.connect()
