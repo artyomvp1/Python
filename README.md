@@ -1,1 +1,1 @@
-*This my remote repository where I story my templates*
+*This is my remote repository where I story my templates*
