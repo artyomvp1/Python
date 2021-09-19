@@ -1,21 +1,19 @@
 from hashlib import sha256
 
-max_nonce = 2000000  # кол-во попыток
+max_nonce = 2000000 
 
 
 def to_hash(text):
-    """Функция просто энкодит sha256 в хэш"""
     return sha256(text.encode("ascii")).hexdigest()
 
 
 def mine(height, transactions, previous_hash, prefix_zeros):
-    """Все параметры находятся в https://www.blockchain.com/explorer"""
     prefix_str = "0" * prefix_zeros
-    for nonce in range(max_nonce):  # в реале должен быть бесконечный цикл
+    for nonce in range(max_nonce): 
         text = str(height) + transactions + previous_hash + str(nonce)
         new_hash = to_hash(text)
         if new_hash.startswith(prefix_str):
-            print(f"Attempt number: {nonce}")  # debug info
+            print(f"Attempt number: {nonce}") 
             return new_hash
 
     raise BaseException
