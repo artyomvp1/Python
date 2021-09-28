@@ -2,6 +2,7 @@ import pypyodbc
 
 
 class Connection:
+    """ Connection works only with SQL Server """
     def __init__(self):
         self.driver = str(input("Driver:\t\t"))
         self.server = str(input("Server:\t\t"))
